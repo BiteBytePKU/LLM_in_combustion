@@ -12,6 +12,7 @@ with st.sidebar:
     st.markdown('这是它的特性：\n- 索引增强\n- 上下文记忆\n- 多种模式')
     st.markdown('---')
     # 显示一个带有自定义属性的消息
+    # 功能待补充
     st.text(msg)
 
 st.title('ChatBot')
@@ -37,6 +38,5 @@ if user_input := st.chat_input("请输入"):
         # response = response.replace("$", "\$")  # disable latex for $ sign
         st.markdown(answer)
         st.session_state.user_input = ""
-        msg = str(docs)
     st.session_state.messages.append(AIMessage(content=answer))
 
