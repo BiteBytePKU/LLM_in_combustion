@@ -58,11 +58,6 @@ def createDb():
     # 目标文件夹
     tar_dir = [
         # "../docs/InternLM",
-        # "../docs/InternLM-XComposer",
-        # "../docs/lagent",
-        # "../docs/lmdeploy",
-        # "../docs/opencompass",
-        # "../docs/xtuner",
         "../docs/combustion"
     ]
 
@@ -77,14 +72,6 @@ def createDb():
         chunk_size=1200, chunk_overlap=200)
     split_docs = text_splitter.split_documents(docs)
 
-    # 加载开源词向量模型BAAI/bge-m3
-    # embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
-    # model_name = "BAAI/bge-m3"
-    # model_kwargs = {"device": "gpu"}
-    # encode_kwargs = {"normalize_embeddings": True}
-    # embeddings = HuggingFaceBgeEmbeddings(
-    #     model_name=model_name, model_kwargs=model_kwargs, encode_kwargs=encode_kwargs
-    # )
     # 构建向量数据库
     # 定义持久化路径
     persist_directory = 'data_base/chroma'
