@@ -1,9 +1,5 @@
 from langchain.vectorstores import Chroma
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 import os
-
-from langchain_core.messages import AIMessage
-
 from model import miniCPM
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
@@ -33,24 +29,16 @@ embeddings = HuggingFaceBgeEmbeddings(
 # # 第四步：将控制台日志器、文件日志器，添加进日志器对象中
 # logger.addHandler(console_handler)
 
-
-
-
-
-
 path = snapshot_download('OpenBMB/miniCPM-bf16')
 
 def load_chain():
-    # 加载问答链
-    # 定义 Embeddings
-    # embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
-
+    
     # 向量数据库持久化路径
     persist_directory = '../db/data_base/chroma'
 
     # 加载数据库
     vectordb = Chroma(
-        persist_directory=persist_directory,  # 允许我们将persist_directory目录保存到磁盘上
+        persist_directory=persist_directory, 
         embedding_function=embeddings
     )
 
@@ -60,22 +48,17 @@ def load_chain():
         memory_key="chat_history", output_key="answer", return_messages=True
     )
     # 定义一个 Prompt Template
-    template = """你是AISI科学智能研发的专家模型，请使用以下上下文来回答最后的问题。如果不知道答案，就说你不知道，不要试图编造答
+    template = """你是AISI科学智能研发的专家模型，请使用以下上下文来回答最后的问题。如果不知道答案，就说你不知道，不要编造答
     案。尽量使答案简明扼要。总是在回答的最后说“谢谢你的提问！”。
     {chat_history}
     {context}
     问题: {question}
     回答:"""
-
     QA_CHAIN_PROMPT = PromptTemplate(input_variables=["chat_history", "context", "question"], template=template)
-
     # 运行 chain
     chain = ConversationalRetrievalChain.from_llm(llm, memory=memory, retriever=vectordb.as_retriever(),
                                         return_source_documents=True,
                                         combine_docs_chain_kwargs={"prompt": QA_CHAIN_PROMPT})
-
-    # chain = RetrievalQA.from_chain_type(llm, memory=memory,retriever=vectordb.as_retriever(), return_source_documents=True,
-    #                                        chain_type_kwargs={"prompt": QA_CHAIN_PROMPT})
     return chain
 
 class myChatModel():
@@ -85,20 +68,6 @@ class myChatModel():
     def __init__(self):
         # 构造函数，加载检索问答链
         self.chain = load_chain()
-
-    def get_answers(self, question: str, chat_history: list = []):
-        """
-        调用问答链进行回答
-        """
-        if question == None or len(question) < 1:
-            return "", chat_history
-        try:
-            chat_history.append(
-                (question, self.chain({"query": question})["result"]))
-            # 将问答结果直接附加到问答历史中，Gradio 会将其展示出来
-            return "", chat_history
-        except Exception as e:
-            return e, chat_history
 
     def get_reply(self, question: str):
         """
@@ -114,9 +83,8 @@ class myChatModel():
             return e
 
 myChat = myChatModel()
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     chain = load_chain()
     res = chain.invoke({"question": "北京大学"})
-    AIMessage(content=res["answer"])
-    print(AIMessage)
+    print(res)
