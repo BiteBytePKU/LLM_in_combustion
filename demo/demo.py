@@ -1,18 +1,29 @@
 import streamlit as st
-from langchain.schema import HumanMessage, AIMessage
+from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from server import myChat
+
 # 实例化核心功能对象
 
 # Streamlit页面配置
 msg = "状态"
-st.set_page_config(page_title="聊天机器人", page_icon=":robot_face:")
+st.set_page_config(page_title="AI4C", page_icon=":robot_face:")
 with st.sidebar:
-    st.title('知识库与参数设置')
+    st.title('燃烧专家模型')
     st.markdown('---')
-    st.markdown('这是它的特性：\n- 索引增强\n- 上下文记忆\n- 多种模式')
+    # 定义一个包含两个选项的列表
+    options = ['minicpm', 'RAG-minicpm']
+
+    # 创建一个下拉菜单，并将"minicpm"设置为默认选项
+    # 因为"minicpm"是列表中的第一个选项，所以index为0
+    selected_option = st.selectbox('请选择模型', options, index=0)
+
+    # 根据选中的选项设置status变量的值
+    status = 1 if selected_option == 'minicpm' else 2
+    st.toast(f'您选择的是：{selected_option}')
+
+    st.markdown('这是它的特性：\n- *索引增强\n- 上下文记忆')
     st.markdown('---')
     # 显示一个带有自定义属性的消息
-    # 功能待补充
     st.text(msg)
 
 st.title('ChatBot')
@@ -26,17 +37,25 @@ for message in messages:
     elif isinstance(message, HumanMessage):
         with st.chat_message('user'):
             st.markdown(message.content)
+    elif isinstance(message, SystemMessage):
+        with st.chat_message('system'):
+            st.markdown(message.content)
 
 if user_input := st.chat_input("请输入"):
     st.session_state.messages.append(HumanMessage(content=user_input))
     st.chat_message("user").markdown(user_input)
     with st.chat_message("assistant"):
-        response = myChat.get_reply(user_input)
-        answer = response["answer"]
-        docs = response["source_documents"]
-        total = answer+"\n引用文档："+str(docs)
-        # response = response.replace("$", "\$")  # disable latex for $ sign
+        response = myChat.get_reply(user_input, status)
+        answer = response["answer"] if status != 1 else response
+        docs = response["source_documents"] if status != 1 else []
         st.markdown(answer)
         st.session_state.user_input = ""
     st.session_state.messages.append(AIMessage(content=answer))
+    if status != 1:
+        i = 1
+        for doc in docs:
+            content = f"文档{i}：\n{doc.page_content}\n{str(doc.metadata)}\n"
+            st.chat_message("system").markdown(content)
+            st.session_state.messages.append(SystemMessage(content=content))
+            i += 1
 
