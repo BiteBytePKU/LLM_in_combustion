@@ -2,13 +2,10 @@ import streamlit as st
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from server import myChat
 
-# 实例化核心功能对象
-
 # Streamlit页面配置
-msg = "状态"
 st.set_page_config(page_title="AI4C", page_icon=":robot_face:")
 with st.sidebar:
-    st.title('燃烧专家模型')
+    st.title('燃烧领域专家模型')
     st.markdown('---')
     # 定义一个包含两个选项的列表
     options = ['minicpm', 'RAG-minicpm']
@@ -19,12 +16,11 @@ with st.sidebar:
 
     # 根据选中的选项设置status变量的值
     status = 1 if selected_option == 'minicpm' else 2
-    st.toast(f'您选择的是：{selected_option}')
+    st.toast(f'您选择的模型是：{selected_option}')
 
-    st.markdown('这是它的特性：\n- *索引增强\n- 上下文记忆')
+    st.markdown('特性：\n- RAG版本具有索引增强\n- 上下文记忆')
     st.markdown('---')
     # 显示一个带有自定义属性的消息
-    st.text(msg)
 
 st.title('ChatBot')
 if 'messages' not in st.session_state:
