@@ -57,11 +57,6 @@ def get_text(dir_path):
 def createDb():
     # 目标文件夹
     tar_dir = [
-        # "../docs/InternLM",
-        # "../docs/InternLM-XComposer",
-        # "../docs/lagent",
-        # "../docs/lmdeploy",
-        # "../docs/opencompass",
         "../docs/paper",
         "../docs/combustion"
     ]
